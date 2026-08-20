@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+:root {
+  --font-inter: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-lora: Georgia, "Times New Roman", serif;
+  --brand: #7C5C3E;
+  --brand-dark: #5A3E27;
+  --brand-mid: #B8916E;
+  --brand-light: #F0E8E0;
+  --cream: #FAF8F5;
+  --cream2: #F3EDE5;
+  --parchment: #FFFEFB;
+  --ink: #18110A;
+  --ink-mid: #4A3F35;
+  --ink-soft: #7A6B5E;
+  --ink-muted: #A89080;
+  --border: #E4D8CC;
+  --green: #4E9A62;
+  --amber: #C08020;
+}
+
+@theme inline {
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-mid: var(--brand-mid);
+  --color-brand-light: var(--brand-light);
+  --color-cream: var(--cream);
+  --color-cream2: var(--cream2);
+  --color-parchment: var(--parchment);
+  --color-ink: var(--ink);
+  --color-ink-mid: var(--ink-mid);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-muted: var(--ink-muted);
+  --color-border: var(--border);
+  --color-green: var(--green);
+  --color-amber: var(--amber);
+  --font-display: var(--font-lora), Georgia, serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .45; transform: scale(.8); }
+}
+.animate-pulse-dot { animation: pulseDot 2.2s ease-in-out infinite; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fadeUp .3s ease; }
+
+@keyframes scrollStrip {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-scroll-strip { animation: scrollStrip 28s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
