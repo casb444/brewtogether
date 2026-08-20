@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Block pushes to any host except the personal GitHub repo.
+set -euo pipefail
+
+remote_name="${1:-}"
+remote_url="${2:-}"
+allowed='github.com[:/]casb444/brewtogether(\.git)?$'
+forbidden='ArunSabariBalajiC'
+
+if [[ "$remote_url" == *"$forbidden"* ]]; then
+  echo "Blocked: BrewTogether must not be pushed to the office GitHub account." >&2
+  echo "Remote: $remote_name  URL: $remote_url" >&2
+  echo "Use origin → https://github.com/casb444/brewtogether.git" >&2
+  exit 1
+fi
+
+if ! [[ "$remote_url" =~ $allowed ]]; then
+  echo "Blocked: BrewTogether may only be pushed to github.com/casb444/brewtogether" >&2
+  echo "Remote: $remote_name  URL: $remote_url" >&2
+  exit 1
+fi
+
+if [[ -x scripts/assert-personal-github.sh ]]; then
+  scripts/assert-personal-github.sh
+fi
+
+exit 0

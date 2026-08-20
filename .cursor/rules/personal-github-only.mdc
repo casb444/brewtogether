@@ -1,0 +1,17 @@
+---
+description: BrewTogether is personal GitHub only (casb444). Never push to the office account.
+alwaysApply: true
+---
+
+This repository must only live at https://github.com/casb444/brewtogether.
+
+Before any `git push`, `git remote` change, `gh repo create`, or GitHub publish:
+
+1. Follow `.cursor/skills/personal-github-only/SKILL.md`
+2. Run `scripts/assert-personal-github.sh` and proceed only if it prints `OK`
+
+Forbidden: GitHub user `ArunSabariBalajiC`, email `sabari@oapps.xyz`, extra remotes, or creating this project under the office account.
+
+Required origin: `https://github.com/casb444/brewtogether.git`
+Required `gh` account: `casb444`
+Required local identity: `casb444` / `108050294+casb444@users.noreply.github.com`
