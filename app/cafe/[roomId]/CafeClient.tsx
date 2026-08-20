@@ -14,6 +14,7 @@ import { TimerCard } from "@/components/TimerCard";
 import { StatsRow } from "@/components/StatsRow";
 import { StreakModal } from "@/components/StreakModal";
 import { UpgradeModal } from "@/components/UpgradeModal";
+import { KeepSeatModal } from "@/components/KeepSeatModal";
 import { GroupManageModal } from "@/components/GroupManageModal";
 import { Button } from "@/components/Button";
 import { LivePill } from "@/components/LivePill";
@@ -37,6 +38,7 @@ interface CafeClientProps {
   pendingRequests: { id: string; user_id: string; display_name: string }[];
   canManage: boolean;
   isOwner: boolean;
+  isAnonymous: boolean;
 }
 
 function computeMinutesAgo(sessionStartedAt: string | null): number {
@@ -59,15 +61,17 @@ function PresencePersonRow({
   task,
   status,
   sessionStartedAt,
+  isGuest,
 }: {
   displayName: string;
   seed: string;
   task: string;
   status: "active" | "break";
   sessionStartedAt: string | null;
+  isGuest?: boolean;
 }) {
   const minutesAgo = usePersonMinutesAgo(sessionStartedAt);
-  return <PersonRow name={displayName} seed={seed} task={task} status={status} minutesAgo={minutesAgo} />;
+  return <PersonRow name={displayName} seed={seed} task={task} status={status} minutesAgo={minutesAgo} isGuest={isGuest} />;
 }
 
 export function CafeClient({
@@ -79,6 +83,7 @@ export function CafeClient({
   pendingRequests: initialRequests,
   canManage,
   isOwner,
+  isAnonymous,
 }: CafeClientProps) {
   const router = useRouter();
   const supabase = createClient();
@@ -88,6 +93,7 @@ export function CafeClient({
   const [streakModalOpen, setStreakModalOpen] = useState(false);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [keepSeatOpen, setKeepSeatOpen] = useState(false);
   const [completeOverlay, setCompleteOverlay] = useState<{ sessions: number; minutes: number } | null>(null);
   const [breakMode, setBreakMode] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -102,9 +108,15 @@ export function CafeClient({
     myId: userId,
     myDisplayName: profile.display_name,
     myAvatarSeed: profile.avatar_seed,
+    isGuest: isAnonymous,
   });
 
-  const { murmurs, send: sendMurmur, error: murmurError } = useMurmurs(room.id, userId, profile.display_name);
+  const { murmurs, send: sendMurmur, error: murmurError } = useMurmurs(
+    room.id,
+    userId,
+    profile.display_name,
+    isAnonymous
+  );
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -149,6 +161,7 @@ export function CafeClient({
         status={session.running ? "active" : "break"}
         minutesAgo={0}
         isMe
+        isGuest={isAnonymous}
       />
       {others.length === 0 && (
         <div className="px-5 py-6 text-center text-xs text-ink-muted italic">
@@ -163,6 +176,7 @@ export function CafeClient({
           task={person.task}
           status={person.status}
           sessionStartedAt={person.session_started_at}
+          isGuest={person.is_guest}
         />
       ))}
     </>
@@ -188,6 +202,11 @@ export function CafeClient({
           <Button href="/groups" variant="primary" size="sm">
             Study groups
           </Button>
+          {isAnonymous && (
+            <Button variant="ghost" size="sm" onClick={() => setKeepSeatOpen(true)}>
+              Keep this seat
+            </Button>
+          )}
           <button onClick={handleSignOut} className="text-xs text-ink-muted hover:text-ink ml-1 cursor-pointer">
             Sign out
           </button>
@@ -214,6 +233,11 @@ export function CafeClient({
           <Link href="/groups" onClick={() => setMenuOpen(false)}>
             Study groups
           </Link>
+          {isAnonymous && (
+            <button className="text-left" onClick={() => { setKeepSeatOpen(true); setMenuOpen(false); }}>
+              Keep this seat
+            </button>
+          )}
           <button className="text-left text-ink-muted" onClick={handleSignOut}>
             Sign out
           </button>
@@ -359,6 +383,8 @@ export function CafeClient({
         onReviewed={(id) => setPendingRequests((requests) => requests.filter((request) => request.id !== id))}
         showToast={showToast}
       />
+
+      <KeepSeatModal open={keepSeatOpen} onClose={() => setKeepSeatOpen(false)} nextPath={`/cafe/${room.id}`} />
 
       {completeOverlay && !breakMode && (
         <div className="fixed inset-0 z-[350] bg-ink/60 backdrop-blur-sm flex items-center justify-center">

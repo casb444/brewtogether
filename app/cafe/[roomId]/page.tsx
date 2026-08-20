@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/config";
 import { CafeClient } from "./CafeClient";
+import { canUseCafeRoom, isAnonymousUser } from "@/lib/auth/guest";
 
 export default async function CafePage({
   params,
@@ -18,8 +19,9 @@ export default async function CafePage({
 
   if (!user) redirect(`/login?next=/cafe/${roomId}`);
 
+  const guest = isAnonymousUser(user);
   const { data: room } = await supabase.from("rooms").select("*").eq("id", roomId).single();
-  if (!room) redirect("/cafe/main");
+  if (!room) redirect(guest ? "/groups" : "/cafe/main");
 
   const { data: membership } = await supabase
     .from("room_members")
@@ -28,13 +30,17 @@ export default async function CafePage({
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (room.join_policy !== "open" && !membership) redirect("/groups");
+  if (!canUseCafeRoom({ isAnonymous: guest, isMember: !!membership, joinPolicy: room.join_policy })) {
+    redirect("/groups");
+  }
 
   const canManage = membership?.role === "owner" || membership?.role === "admin";
 
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single();
   const { data: streak } = await supabase.from("streaks").select("*").eq("user_id", user.id).single();
-  const { data: allRooms } = await supabase.from("rooms").select("*").is("archived_at", null).order("sort_order");
+  const { data: allRooms } = guest
+    ? await supabase.from("rooms").select("*").eq("id", room.id).is("archived_at", null)
+    : await supabase.from("rooms").select("*").is("archived_at", null).order("sort_order");
 
   const { data: pendingRequests } = canManage
     ? await supabase.from("room_join_requests").select("id, user_id").eq("room_id", room.id).eq("status", "pending")
@@ -61,6 +67,7 @@ export default async function CafePage({
       pendingRequests={namedRequests}
       canManage={canManage}
       isOwner={membership?.role === "owner" || room.created_by === user.id}
+      isAnonymous={guest}
     />
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Murmur } from "@/types/database";
+import { murmurAuthorTag } from "@/lib/murmurs/guest-tag";
 
 interface MurmurFeedProps {
   murmurs: Murmur[];
@@ -32,14 +33,24 @@ export function MurmurFeed({ murmurs, onSend, canPost }: MurmurFeedProps) {
             It&apos;s quiet in here. Be the first to say something.
           </div>
         )}
-        {murmurs.map((m) => (
-          <div key={m.id} className="animate-fade-up">
-            <div className="text-[10px] font-semibold text-ink-soft">{m.display_name}</div>
-            <div className="font-display text-xs italic text-ink-mid leading-relaxed mt-px">
-              &ldquo;{m.text}&rdquo;
+        {murmurs.map((m) => {
+          const tag = murmurAuthorTag(Boolean(m.is_guest));
+          return (
+            <div key={m.id} className="animate-fade-up">
+              <div className="text-[10px] font-semibold text-ink-soft">
+                {m.display_name}
+                {tag && (
+                  <span className="ml-1 text-[9px] uppercase tracking-wide text-ink-muted font-semibold">
+                    {tag}
+                  </span>
+                )}
+              </div>
+              <div className="font-display text-xs italic text-ink-mid leading-relaxed mt-px">
+                &ldquo;{m.text}&rdquo;
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <div className="flex gap-1.5">
         <input

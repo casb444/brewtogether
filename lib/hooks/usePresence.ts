@@ -10,6 +10,7 @@ interface UsePresenceOptions {
   myId: string;
   myDisplayName: string;
   myAvatarSeed: string;
+  isGuest?: boolean;
 }
 
 /**
@@ -17,7 +18,7 @@ interface UsePresenceOptions {
  * (built on Phoenix-style CRDT presence over a Realtime channel).
  * Every connected client sees the same live list without polling.
  */
-export function usePresence({ roomId, myId, myDisplayName, myAvatarSeed }: UsePresenceOptions) {
+export function usePresence({ roomId, myId, myDisplayName, myAvatarSeed, isGuest = false }: UsePresenceOptions) {
   const [others, setOthers] = useState<PresenceState[]>([]);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const supabase = createClient();
@@ -28,6 +29,7 @@ export function usePresence({ roomId, myId, myDisplayName, myAvatarSeed }: UsePr
     avatar_seed: myAvatarSeed,
     task: "",
     status: "active",
+    is_guest: isGuest,
     session_started_at: null,
   });
 

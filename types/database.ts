@@ -120,12 +120,14 @@ export interface Database {
           display_name: string;
           text: string;
           created_at: string;
+          is_guest: boolean;
         };
         Insert: {
           user_id: string;
           room_id: string;
           display_name: string;
           text: string;
+          is_guest?: boolean;
         };
         Update: {
           text?: string;
@@ -272,5 +274,6 @@ export interface PresenceState {
   task: string;
   status: "active" | "break";
   session_started_at: string | null;
+  is_guest?: boolean;
   is_me?: boolean;
 }

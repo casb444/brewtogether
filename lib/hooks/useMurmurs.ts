@@ -6,7 +6,7 @@ import type { Murmur } from "@/types/database";
 
 const MAX_VISIBLE = 8;
 
-export function useMurmurs(roomId: string, userId: string | null, displayName: string) {
+export function useMurmurs(roomId: string, userId: string | null, displayName: string, isGuest = false) {
   const [murmurs, setMurmurs] = useState<Murmur[]>([]);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
@@ -55,11 +55,12 @@ export function useMurmurs(roomId: string, userId: string | null, displayName: s
         room_id: roomId,
         display_name: displayName,
         text: trimmed,
+        is_guest: isGuest,
       });
       if (insertError) setError(insertError.message);
       else setError(null);
     },
-    [roomId, userId, displayName, supabase]
+    [roomId, userId, displayName, isGuest, supabase]
   );
 
   return { murmurs, send, error };

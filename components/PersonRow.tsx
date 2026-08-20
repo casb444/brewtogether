@@ -7,9 +7,10 @@ interface PersonRowProps {
   status: "active" | "break";
   minutesAgo: number;
   isMe?: boolean;
+  isGuest?: boolean;
 }
 
-export function PersonRow({ name, seed, task, status, minutesAgo, isMe }: PersonRowProps) {
+export function PersonRow({ name, seed, task, status, minutesAgo, isMe, isGuest }: PersonRowProps) {
   const timeLabel =
     minutesAgo < 60 ? `${minutesAgo}m` : `${Math.floor(minutesAgo / 60)}h ${minutesAgo % 60}m`;
 
@@ -20,6 +21,11 @@ export function PersonRow({ name, seed, task, status, minutesAgo, isMe }: Person
         <div className="text-[13px] font-medium text-ink truncate">
           {name}
           {isMe && <span className="text-[10px] text-ink-muted font-normal ml-1">(you)</span>}
+          {isGuest && (
+            <span className="ml-1 text-[9px] uppercase tracking-wide text-ink-muted font-semibold bg-cream2 border border-border rounded-full px-1.5 py-px">
+              anonymous
+            </span>
+          )}
         </div>
         <div className="text-[11px] text-ink-muted italic truncate mt-px">{task || "…"}</div>
       </div>

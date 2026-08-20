@@ -8,6 +8,7 @@ import type { Room } from "@/types/database";
 
 interface LandingClientProps {
   isAuthed: boolean;
+  isAnonymous?: boolean;
   rooms: Room[];
   backendReady: boolean;
   sessionCount: number;
@@ -39,10 +40,11 @@ const STEPS = [
   { num: 3, title: "Leave a murmur", desc: "When you finish, drop a quiet thought in the Murmurs stream. One line. No replies. A small record you were here." },
 ];
 
-export function LandingClient({ isAuthed, rooms, backendReady, sessionCount }: LandingClientProps) {
+export function LandingClient({ isAuthed, isAnonymous = false, rooms, backendReady, sessionCount }: LandingClientProps) {
   const pricingEnabled = isPricingEnabled();
   const donationUrl = getDonationUrl();
-  const primaryHref = isAuthed ? "/cafe/main" : "/signup";
+  const cafeHref = isAnonymous ? "/groups" : "/cafe/main";
+  const primaryHref = isAuthed ? cafeHref : "/signup";
   const proof = ["No camera needed", "Free during launch", "Works on any device"];
   if (sessionCount > 0) proof.push(`${sessionCount.toLocaleString()}+ sessions logged`);
 
@@ -57,9 +59,9 @@ export function LandingClient({ isAuthed, rooms, backendReady, sessionCount }: L
             Study groups
           </Link>
           {isAuthed ? (
-            <Button href="/cafe/main" variant="primary" size="sm">
+            <Button href={cafeHref} variant="primary" size="sm">
               <span className="sm:hidden">Enter</span>
-              <span className="hidden sm:inline">Enter the café →</span>
+              <span className="hidden sm:inline">{isAnonymous ? "Back to your group →" : "Enter the café →"}</span>
             </Button>
           ) : (
             <>

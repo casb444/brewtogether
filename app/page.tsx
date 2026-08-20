@@ -1,10 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/config";
+import { isAnonymousUser } from "@/lib/auth/guest";
 import { LandingClient } from "./LandingClient";
 
 export default async function LandingPage() {
   if (!isSupabaseConfigured()) {
-    return <LandingClient isAuthed={false} rooms={[]} backendReady={false} sessionCount={0} />;
+    return <LandingClient isAuthed={false} isAnonymous={false} rooms={[]} backendReady={false} sessionCount={0} />;
   }
 
   const supabase = await createClient();
@@ -22,6 +23,7 @@ export default async function LandingPage() {
   return (
     <LandingClient
       isAuthed={!!userData.user}
+      isAnonymous={isAnonymousUser(userData.user)}
       rooms={rooms ?? []}
       backendReady
       sessionCount={sessionCount}
